@@ -29,7 +29,7 @@
 
 
             <EditText
-                android:id="@+id/EditText_Search"
+                android:id="@+id/search"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -38,7 +38,7 @@
 
 
             <TextView
-                android:id="@+id/TextView_resultsCount"
+                android:id="@+id/resultsCount"
                 android:layout_width="0dp"
                 android:layout_weight="2"
                 android:layout_gravity="center"

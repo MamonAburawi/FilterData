@@ -28,30 +28,44 @@ class DataListFragment : Fragment() {
     private lateinit var binding: FragmentListDataBinding
     private lateinit var viewModel: UserViewModel
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_list_data, container, false)
 
 
         viewModel = ViewModelProvider(this).get(UserViewModel::class.java)
 
 
-        // data observed
-        viewModel.filterList.observe(viewLifecycleOwner, Observer { filterData ->
-            updateListData(filterData) // for update recycle view
-        })
+        binding.apply {
+
+            /** live data **/
+            viewModel.users.observe(viewLifecycleOwner, Observer { users ->
+                updateListData(users) // for update recycle view
+            })
 
 
-        binding.EditTextSearch.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+            /** live data **/
+            viewModel.resultCount.observe(viewLifecycleOwner, Observer { results->
+                if (results != null){
+                    resultsCount.text = "Results: $results"
+                }
+            })
 
-            override fun onTextChanged(charSequence: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                updateListData(viewModel.filterList(charSequence.toString()))
-            }
+            /** edit text **/
+            search.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
-            override fun afterTextChanged(p0: Editable?) {}
-        })
+                override fun onTextChanged(charSequence: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                    updateListData(viewModel.filterList(charSequence.toString()))
+                }
+
+                override fun afterTextChanged(p0: Editable?) {}
+            })
+
+
+
+
+        }
 
 
 
@@ -60,24 +74,11 @@ class DataListFragment : Fragment() {
 
 
     private fun updateListData(list : ArrayList<UserData>) {
-        checkFromList(list) // check from fake database is empty or not.
-        setResultCount(list.size)
         binding.recyclerView.adapter = ListAdapter(list)
     }
 
 
-    private fun checkFromList(list: ArrayList<UserData>) {
-        if (list.size == 0) { // no results found
-            binding.TextViewNoResults.visibility = View.VISIBLE
-        } else { // you have results
-            binding.TextViewNoResults.visibility = View.GONE
-        }
-    }
 
-
-    private fun setResultCount(r: Int) {
-        binding.TextViewResultsCount.text = "Results: $r"
-    }
 
 
 

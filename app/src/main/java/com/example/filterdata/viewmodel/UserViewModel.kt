@@ -13,17 +13,19 @@ class UserViewModel(): ViewModel() {
 
     private val repository = Repository()
 
-
     private val viewModelScope = CoroutineScope(Dispatchers.Main + Job())
 
+    private val _users = MutableLiveData<ArrayList<UserData>>()
+    val users : LiveData<ArrayList<UserData>> = _users
 
-
-    private val _filterList = MutableLiveData<ArrayList<UserData>>()
-    val filterList : LiveData<ArrayList<UserData>> = _filterList
+    private val _resultsCount = MutableLiveData<Int>()
+    val resultCount: LiveData<Int> = _resultsCount
 
 
     init {
-        _filterList.value = repository.getData()
+        val data = repository.getData()
+        _users.value = data
+        _resultsCount.value = data.size
     }
 
 
@@ -32,16 +34,18 @@ class UserViewModel(): ViewModel() {
          var filter = ArrayList<UserData>()
              val filterPattern = charSequence.trim()
              filter = if (filterPattern.isNotEmpty()){
-                 _filterList.value!!.filter { it.name.contains(filterPattern) } as ArrayList<UserData>
+                 _users.value!!.filter { it.name.contains(filterPattern) } as ArrayList<UserData>
              }else{
                  repository.getData()
              }
+         _resultsCount.value = filter.size
          return filter
     }
 
 
     override fun onCleared() {
         super.onCleared()
+
         viewModelScope.cancel()
     }
 
